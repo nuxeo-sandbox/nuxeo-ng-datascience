@@ -31,7 +31,7 @@ Contributors:
         ecm-primary-type="Report"
         data="{{mostApproved}}"
         grouped-by="dc:creator"
-        ecm-lifecycle-state="accepted"
+        where="[[_lifeCycleAccepted]]"
         index="[[index]]"
         groupLimit="7">
     </nuxeo-repository-data>
@@ -50,7 +50,9 @@ Contributors:
 <script>
   Polymer({
     is: 'datascience-analytics-dashboard',
+
     behaviors: [Nuxeo.ChartDataBehavior],
+
     properties: {
       index: {
         type: String,
@@ -63,6 +65,12 @@ Contributors:
         type: Array,
         value: ['#fb8072', '#8dd3c7', '#ffffb3', '#bebada', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd']
       }
+    },
+
+    _lifeCycleAccepted: function() {
+      return {
+        'ecm:currentLifeCycleState': "accepted"
+      };
     }
   });
 </script>
