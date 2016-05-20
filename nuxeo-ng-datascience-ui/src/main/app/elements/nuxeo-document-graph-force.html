@@ -108,7 +108,9 @@
                     links: links
                 };
 
-                this.$.parentGetter.path = "/query/DatasetParents?queryParams="+this.root.properties['dataset:searchparent'].join();
+                var ids = "'"+this.root.properties['dataset:searchparent'].join()+"'";
+                ids = ids.replace(/,/g, "','");
+                this.$.parentGetter.path = "/query/DatasetParentsRest?queryParams="+ids;
                 this.$.parentGetter.execute();
 
             },
