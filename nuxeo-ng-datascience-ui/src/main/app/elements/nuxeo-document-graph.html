@@ -1,0 +1,112 @@
+<dom-module id='nuxeo-document-graph'>
+  <template>
+    <style include="shared-styles">
+       .container {
+          width: 100%;
+       }
+
+       svg {
+            padding: 1%;
+       }
+    </style>
+
+    <nuxeo-resource id="query" auto path="/query/DatasetChildren?queryParams={{rootId}}" on-response="_OnResponse"></nuxeo-resource>
+    <div class="container">
+          <svg id="svg"></svg>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'nuxeo-document-graph',
+      // Expose properties
+      properties: {
+        rootId: {
+          type: String
+       },
+       linkProperty: {
+         type: String
+       }
+      },
+
+      ready: function() {
+        console.log("--nuxeo-document-graph ready");
+        this.createElements();
+      },
+
+      createElements: function () {
+         var width = 900,height = 400;
+
+         this.cluster = d3.layout.cluster().size([height, width - 160]);
+
+         this.diagonal = d3.svg.diagonal()
+             .projection(function(d) { return [d.y, d.x]; });
+
+         this.svg = d3.select(this.$.svg)
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", "translate(40,0)");
+      },
+
+      _OnResponse: function (e) {
+         var entries = e.detail.response.entries;
+         var root = {name:'Current',id:this.rootId,children:[]};
+         var docs = {};
+         docs[this.rootId] = root;
+
+         entries.forEach(function(entry) {
+            //get object
+            var entryObject = docs[entry.uid];
+            if (entryObject === undefined) {
+                  entryObject = {name:entry.title,id:entry.uid,children:[]};
+                  docs[entry.uid] = entryObject;
+            } else {
+               entryObject.name = entry.title;
+            }
+
+            var parents = entry.properties['dataset:parents'];
+            parents.forEach(function(parent) {
+               var parentObject = docs[parent];
+               if (parentObject === undefined) {
+                     parentObject = {name:parent,id:parent,children:[]};
+                     docs[parent] = parentObject;
+               }
+               parentObject.children.push(entryObject)
+            });
+         });
+
+         this.data = root;
+         this.drawChart();
+      },
+
+      drawChart: function () {
+         var nodes = this.cluster.nodes(this.data),
+               links = this.cluster.links(nodes);
+
+         var link = this.svg.selectAll(".link")
+            .data(links)
+            .enter().append("path")
+            .attr("class", "link")
+            .attr("d", this.diagonal);
+
+         var node = this.svg.selectAll(".node")
+            .data(nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+
+         node.append("circle")
+            .attr("r", 4.5);
+
+         node.append("svg:a").attr("xlink:href",function(d) { return "http://datascience-demo.cloud.nuxeo.com/nuxeo/nxdoc/default/"+d.id+"/view_documents"; }).append("svg:text")
+            .attr("dx", function(d) { return d.children ? -8 : 8; })
+            .attr("dy", 3)
+            .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+            .text(function(d) { return d.name; });
+         }
+    });
+
+  </script>
+
+</dom-module>

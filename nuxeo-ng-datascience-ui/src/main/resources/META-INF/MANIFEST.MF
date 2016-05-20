@@ -1,0 +1,10 @@
+nifest-Version: 1.0
+Bundle-Vendor: Nuxeo
+Nuxeo-RequiredBy: org.nuxeo.ecm.war
+Bundle-Version: 0.0.1
+Bundle-Name: Nuxeo NG datascience UI
+Bundle-ManifestVersion: 1
+Bundle-SymbolicName: nuxeo-ng-datascience-ui;singleton:=true
+Nuxeo-Component: OSGI-INF/extensions/auth-config.xml,
+    OSGI-INF/extensions/widget-types-contrib.xml
+

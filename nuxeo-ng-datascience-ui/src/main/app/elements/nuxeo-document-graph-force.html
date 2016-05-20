@@ -1,0 +1,174 @@
+<dom-module id='nuxeo-document-graph-force'>
+    <template>
+        <style include="shared-styles">
+            .container {
+                width: 100%;
+            }
+
+            svg {
+                padding: 1%;
+            }
+
+        </style>
+        <nuxeo-resource id="rootGetter" auto path="/id/{{rootId}}" on-response="_onGetRoot"></nuxeo-resource>
+        <nuxeo-resource id="childrenGetter" path="/query/DatasetChildren?queryParams={{rootId}}" on-response="_onGetChildren"></nuxeo-resource>
+        <nuxeo-resource id="parentGetter" path="/query/DatasetParents?queryParams=" on-response="_onGetParents"></nuxeo-resource>
+        <div class="container">
+            <svg id="svg"></svg>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'nuxeo-document-graph-force',
+            // Expose properties
+            properties: {
+                rootId: {
+                    type: String
+                },
+                root: {
+                   type:Object
+                },
+                data: {
+                  type:Object
+                }
+            },
+
+            ready: function() {
+                console.log("--nuxeo-document-graph ready");
+                this.createElements();
+            },
+
+            createElements: function() {
+                var width = 900,
+                    height = 400;
+
+                this.color = d3.scale.category20();
+
+                this.force = d3.layout.force().gravity(0.05).charge(-220).distance(150).size([width, height]);
+
+                this.svg = d3.select(this.$.svg).attr("width", width).attr("height", height);
+            },
+
+
+            _onGetRoot: function(e) {
+                this.root = e.detail.response;
+                this.$.childrenGetter.execute();
+             },
+
+            _onGetChildren: function(e) {
+                var entries = e.detail.response.entries;
+
+                var nodes = [];
+                var links = [];
+
+                var root = {
+                    name: 'Current',
+                    id: this.rootId,
+                    group: 0
+                };
+                this.docs = {};
+                var docs = this.docs;
+                docs[this.rootId] = root;
+                nodes.push(root);
+
+                entries.forEach(function(entry) {
+                    //get object
+                    var entryObject = docs[entry.uid];
+                    if (entryObject === undefined) {
+                        entryObject = {
+                            name: entry.title,
+                            id: entry.uid,
+                            group: 1
+                        };
+                        docs[entry.uid] = entryObject;
+                        nodes.push(entryObject)
+                    } else {
+                        entryObject.name = entry.title;
+                    }
+
+                    var parents = entry.properties['dataset:parents'];
+                    parents.forEach(function(parent) {
+                        var parentObject = docs[parent];
+                        if (parentObject === undefined) {
+                            parentObject = {
+                                name: parent,
+                                id: parent,
+                                group: 1
+                            };
+                            docs[parent] = parentObject;
+                            nodes.push(parentObject);
+                        }
+                        links.push({source: nodes.indexOf(parentObject), target: nodes.indexOf(entryObject)});
+                    });
+                });
+
+                this.data = {
+                    nodes: nodes,
+                    links: links
+                };
+
+                this.$.parentGetter.path = "/query/DatasetParents?queryParams="+this.root.properties['dataset:searchparent'].join();
+                this.$.parentGetter.execute();
+
+            },
+
+            _onGetParents: function(e) {
+               var me = this;
+
+                var entries = e.detail.response.entries;
+                var docs = this.docs;
+                entries.forEach(function(entry) {
+                   docs[entry.uid] = entry;
+                })
+
+                var lineage = this.root.properties['dataset:lineage'];
+                lineage.forEach(function(entry) {
+                  var parentDoc = docs[entry.parent];
+                  var node = {name: parentDoc.title, id: parentDoc.uid, group: 2};
+                  me.data.nodes.push(node);
+                  me.data.links.push({source: me.data.nodes.indexOf(node), target: 0});
+               })
+
+                this.drawChart();
+             },
+
+            drawChart: function() {
+
+               var me = this;
+
+                this.force.nodes(this.data.nodes).links(this.data.links).start();
+
+                var link = this.svg.selectAll(".link").data(this.data.links).enter().append("line").attr("class", "link").style("stroke-width", function(d) {
+                    return Math.sqrt(d.value);
+                });
+
+                var node = this.svg.selectAll(".node")
+                  .data(this.data.nodes)
+                  .enter().append("g")
+                  .attr("class", "node")
+                  .call(this.force.drag);
+
+                node.append("circle").attr("class", "node").attr("r", 10).style("fill", function(d) {
+                    return me.color(d.group);
+                });
+
+                node.append("svg:a").attr("xlink:href",function(d) { return "http://datascience-demo.cloud.nuxeo.com/nuxeo/nxdoc/default/"+d.id+"/view_documents"; }).append("svg:text")
+                  .attr("dx", function(d) { return d.children ? -8 : 8; })
+                  .attr("dy", 3)
+                  .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+                  .text(function(d) { return d.name; })
+
+                  this.force.on("tick", function() {
+                    link.attr("x1", function(d) { return d.source.x; })
+                        .attr("y1", function(d) { return d.source.y; })
+                        .attr("x2", function(d) { return d.target.x; })
+                        .attr("y2", function(d) { return d.target.y; });
+
+                    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+                  });
+            }
+        });
+    </script>
+
+</dom-module>
