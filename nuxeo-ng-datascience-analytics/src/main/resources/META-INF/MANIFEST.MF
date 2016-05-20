@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-Bundle-SymbolicName: nuxeo-datascience
-Bundle-Name: nuxeo-datascience
+Bundle-SymbolicName: nuxeo-ng-datascience
+Bundle-Name: nuxeo-ng-datascience
 Bundle-Version: 1.0.qualifier
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
