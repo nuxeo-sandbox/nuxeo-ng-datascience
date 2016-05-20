@@ -32,4 +32,11 @@
         parent-id="#{currentDocument.id}"> </datascience-analytics-dashboard>
   </template>
 
+  <script>
+    var t = document.querySelector('template');
+    var currentDate = moment();
+    t.endDate = currentDate.format("YYYY-MM-DD");
+    t.startDate = currentDate.subtract(1, 'months').format("YYYY-MM-DD");
+  </script>
+
 </h:panelGroup>
