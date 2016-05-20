@@ -31,11 +31,12 @@ Contributors:
         ecm-primary-type="Report"
         data="{{mostApproved}}"
         grouped-by="dc:creator"
-        where="[[_lifeCycleAccepted]]"
+        where="[[_lifeCycleState('accepted')]]"
         index="[[index]]"
         groupLimit="7">
     </nuxeo-repository-data>
-    <paper-card heading='Most Approved Report Authors'
+
+    <paper-card heading='Most Approved Reports'
         elevation="2">
       <div class="card-content">
         <datascience-data-table data="[[mostApproved]]">
@@ -43,6 +44,147 @@ Contributors:
       </div>
     </paper-card>
 
+    <!-- Most rejected reports -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Report"
+        data="{{mostRejected}}"
+        grouped-by="dc:creator"
+        where="[[_lifeCycleState('rejected')]]"
+        index="[[index]]"
+        groupLimit="7">
+    </nuxeo-repository-data>
+
+    <paper-card heading='Most Rejected Reports'
+        elevation="2">
+      <div class="card-content">
+        <datascience-data-table data="[[mostRejected]]">
+        </datascience-data-table>
+      </div>
+    </paper-card>
+
+    <!-- Most used Datasets -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Dataset"
+        grouped-by="dataset:parents"
+        data="{{mostUsedDatasets}}"
+        index="[[index]]">
+    </nuxeo-repository-data>
+
+    <paper-card heading="Most Used Datasets"
+        elevation="2">
+      <div class="card-content">
+        <chart-pie values="[[_values(mostUsedDatasetsFormatted)]]"
+            series="[[_series(mostUsedDatasetsFormatted)]]"
+            colors="[[colors]]"
+            options='{"responsive": true, "animation": false}'>
+        </chart-pie>
+      </div>
+    </paper-card>
+
+    <!-- Most used Datasources -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Dataset"
+        grouped-by="dataset:datasources"
+        data="{{mostUsedDatasources}}"
+        index="[[index]]">
+    </nuxeo-repository-data>
+
+    <paper-card heading="Most Used Datasources"
+        elevation="2">
+      <div class="card-content">
+        <chart-pie values="[[_values(mostUsedDatasourcesFormatted)]]"
+            series="[[_series(mostUsedDatasourcesFormatted)]]"
+            colors="[[colors]]"
+            options='{"responsive": true, "animation": false}'>
+        </chart-pie>
+      </div>
+    </paper-card>
+
+    <!-- Entity Types -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Report,Dataset,Datasource,Notebook"
+        grouped-by="ecm:primaryType"
+        group-limit="10"
+        data="{{typeCount}}"
+        index="[[index]]">
+    </nuxeo-repository-data>
+
+    <paper-card heading="Entity Types"
+        elevation="2">
+      <div class="card-content">
+        <chart-pie values="[[_values(typeCount)]]"
+            series="[[_series(typeCount)]]"
+            colors="[[colors]]"
+            options='{"responsive": true, "animation": false}'>
+        </chart-pie>
+      </div>
+    </paper-card>
+
+
+    <!-- Top 10 creators -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Report,Dataset,Datasource,Notebook"
+        grouped-by="dc:creator"
+        group-limit="10"
+        data="{{topCreators}}"
+        index="[[index]]">
+    </nuxeo-repository-data>
+
+    <paper-card heading="Top 10 creators"
+        elevation="2">
+      <div class="card-content">
+        <chart-pie values="[[_values(topCreators)]]"
+            series="[[_series(topCreators)]]"
+            colors="[[colors]]"
+            options='{"responsive": true, "animation": false}'>
+        </chart-pie>
+      </div>
+    </paper-card>
+
+    <!-- Entities created per week -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Report,Dataset,Datasource,Notebook"
+        with-date-intervals="week"
+        date-field="dc:created"
+        data="{{docsCreatedPerWeek}}"
+        index="[[index]]">
+    </nuxeo-repository-data>
+
+    <paper-card heading="Entities Created / Week"
+        elevation="2">
+      <div class="card-content">
+        <chart-line labels="[[_labels(docsCreatedPerWeek)]]"
+            values="[[_values(docsCreatedPerWeek)]]"
+            options='{"responsive": true, "animation": false, "datasetFill": false}'>
+        </chart-line>
+      </div>
+    </paper-card>
+
+    <!-- Entities modified per week -->
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Report,Dataset,Datasource,Notebook"
+        with-date-intervals="week"
+        date-field="dc:modified"
+        data="{{docsModifiedPerWeek}}"
+        index="[[index]]">
+    </nuxeo-repository-data>
+
+    <paper-card heading="Entities Modified / Week"
+        elevation="2">
+      <div class="card-content">
+        <chart-line labels="[[_labels(docsModifiedPerWeek)]]"
+            values="[[_values(docsModifiedPerWeek)]]"
+            options='{"responsive": true, "animation": false, "datasetFill": false}'>
+        </chart-line>
+      </div>
+    </paper-card>
   </template>
 
 </dom-module>
@@ -63,14 +205,51 @@ Contributors:
       parentId: String,
       colors: {
         type: Array,
-        value: ['#fb8072', '#8dd3c7', '#ffffb3', '#bebada', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd']
+        value: ["#3366cc", "#dc3912", "#ff9900", "#109618", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac", "#b77322",
+          "#16d620", "#b91383", "#f4359e", "#9c5935", "#a9c413", "#2a778d", "#668d1c", "#bea413", "#0c5922", "#743411"
+        ]
+      },
+      mostUsedDatasourcesFormatted: Array,
+      mostUsedDatasetsFormatted: Array
+    },
+
+    observers: ['_formatMostUsedDatasources(mostUsedDatasources)',
+      '_formatMostUsedDatasets(mostUsedDatasets)'
+    ],
+
+    /**
+     * This is a workaround for the fact that the default distribution does not include <nuxeo-document>
+     */
+    _formatMostUsedDatasources: function(data) {
+      if (data && data.length > 0) {
+        this.mostUsedDatasourcesFormatted = this._idsToNames(data);
       }
     },
 
-    _lifeCycleAccepted: function() {
+    _formatMostUsedDatasets: function(data) {
+      if (data && data.length > 0) {
+        this.mostUsedDatasetsFormatted = this._idsToNames(data);
+      }
+    },
+
+    _idsToNames: function(data, target) {
+      return data.map(function(id) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "api/v1/id/" + id.key, false);
+        xhr.send();
+
+        return {
+          "key": JSON.parse(xhr.responseText).title,
+          "value": id.value
+        };
+      });
+
+    },
+
+    _lifeCycleState: function(state) {
       return {
-        'ecm:currentLifeCycleState': "accepted"
-      };
+        'ecm:currentLifeCycleState': state
+      }
     }
   });
 </script>
