@@ -125,12 +125,22 @@
                 })
 
                 var lineage = this.root.properties['dataset:lineage'];
-                lineage.forEach(function(entry) {
+
+                //add nodes
+                lineage.forEach(function(entry,index) {
                   var parentDoc = docs[entry.parent];
                   var node = {name: parentDoc.title, id: parentDoc.uid, group: 2};
                   me.data.nodes.push(node);
-                  me.data.links.push({source: me.data.nodes.indexOf(node), target: 0});
                })
+
+               //add links
+               lineage.forEach(function(entry,index) {
+                  if (index !== lineage.length-1) {
+                     me.data.links.push({source: me.data.nodes.length-lineage.length+index, target: me.data.nodes.length-lineage.length+index+1});
+                  } else {
+                     me.data.links.push({source: me.data.nodes.length-1, target: 0});
+                  }
+              })
 
                 this.drawChart();
              },
