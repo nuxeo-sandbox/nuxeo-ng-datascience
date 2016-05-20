@@ -12,74 +12,36 @@ Contributors:
 -->
 
 
-<link rel="import" href="../nuxeo-chart-data-behavior/nuxeo-chart-data-behavior.html">
-<link rel="import" href="datascience-data-table.html">
+<link rel="import"
+    href="../nuxeo-chart-data-behavior/nuxeo-chart-data-behavior.html">
+<link rel="import"
+    href="datascience-data-table.html">
 
 <dom-module id="datascience-analytics-dashboard">
 
-  <link rel="import" type="css" href="dashboard.css">
+  <link rel="import"
+      type="css"
+      href="dashboard.css">
 
   <template>
 
     <!-- Most approved reports -->
-    <nuxeo-repository-data start-date="[[startDate]]" end-date="[[endDate]]" ecm-primary-type="Report"
-                        data="{{mostApproved}}" grouped-by="dc:author" ecm-life-cycle-state="Approved"
-                       index="[[index]]" groupLimit="7" >
+    <nuxeo-repository-data start-date="[[startDate]]"
+        end-date="[[endDate]]"
+        ecm-primary-type="Report"
+        data="{{mostApproved}}"
+        grouped-by="dc:creator"
+        ecm-life-cycle-state="Approved"
+        index="[[index]]"
+        groupLimit="7">
     </nuxeo-repository-data>
-    <paper-card heading='Best Report Authors' elevation="2">
+    <paper-card heading='Most Approved Report Authors'
+        elevation="2">
       <div class="card-content">
         <datascience-data-table data="[[mostApproved]]">
         </datascience-data-table>
       </div>
     </paper-card>
-
-    <!-- Top Dislikes -->
-    <nuxeo-repository-data start-date="[[startDate]]" end-date="[[endDate]]" ecm-primary-type="Video"
-                        data="{{mostDisliked}}" grouped-by="dc:title" ecm-life-cycle-state="Published"
-                       index="[[index]]" metrics="sum(video_schema:dislikesCount)" groupLimit="7">
-    </nuxeo-repository-data>
-
-    <paper-card heading="Top Disliked Videos" elevation="2">
-      <div class="card-content">
-        <datascience-data-table data="[[mostDisliked]]">
-        </datascience-data-table>
-      </div>
-    </paper-card>
-
-    <!-- Top Viewed -->
-    <nuxeo-repository-data start-date="[[startDate]]" end-date="[[endDate]]" ecm-primary-type="Video"
-                        data="{{mostViewed}}" grouped-by="dc:title" ecm-life-cycle-state="Published"
-                       index="[[index]]" metrics="sum(video_schema:viewsCount)" groupLimit="7">
-    </nuxeo-repository-data>
-
-    <paper-card heading="Top Viewed Videos" elevation="2">
-      <div class="card-content">
-        <datascience-data-table data="[[mostViewed]]">
-        </datascience-data-table>
-      </div>
-    </paper-card>
-
-    <paper-card heading="Top Channels" elevation="2">
-      <div class="card-content">
-        <datascience-data-table data="">
-        </datascience-data-table>
-      </div>
-    </paper-card>
-
-    <paper-card heading="Channel Pie" elevation="2">
-      <div class="card-content">
-        <datascience-data-table data="">
-        </datascience-data-table>
-      </div>
-    </paper-card>
-
-    <paper-card heading="Contributors" elevation="2">
-      <div class="card-content">
-        <datascience-data-table data="">
-        </datascience-data-table>
-      </div>
-    </paper-card>
-
 
   </template>
 
