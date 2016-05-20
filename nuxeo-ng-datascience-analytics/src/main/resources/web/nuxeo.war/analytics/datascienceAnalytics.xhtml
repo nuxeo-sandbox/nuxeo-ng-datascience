@@ -14,7 +14,7 @@
       style="display: inline; width: 150px"></input>
   </div>
 
-  <nuxeo-connection id="nx_connection" url="#{baseURL}"></nuxeo-connection> <datascience-analytics-dashboard
+  <nuxeo-connection url="/nuxeo"></nuxeo-connection> <datascience-analytics-dashboard
     index="#{frameworkPropertyActions.getProperty('elasticsearch.indexName')}" start-date="[[startDate]]" end-date="[[endDate]]"
     parent-id="#{currentDocument.id}"> </datascience-analytics-dashboard> </template>
 
