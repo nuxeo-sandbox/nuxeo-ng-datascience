@@ -17,7 +17,6 @@
         <module>nuxeo-ng-datascience-mp</module>
         <module>nuxeo-ng-datascience-ui</module>
         <module>nuxeo-ng-datascience-core</module>
-        <module>nuxeo-ng-datascience-analytics</module>
     </modules>
 
     <repositories>
